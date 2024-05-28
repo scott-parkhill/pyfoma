@@ -102,7 +102,7 @@ import unittest
 
 def equivalent(fst1, fst2):
     comp = FST.re("($fst1 - $fst2) | ($fst2 - $fst1)", {"fst1":fst1, "fst2":fst2})
-    return len(comp.finalstates) == 0
+    return len(comp.final_states) == 0
 
 class TestValueFlags(unittest.TestCase):
     def test_pos(self):
