@@ -5,25 +5,25 @@
 import graphviz
 
 
-def draw_cfg(string: str, style='tree'):
+def draw_cfg(cfg_string: str, style='tree'):
     """
     Draws a CFG string as a tree with graphviz.
-    :param string: The CFG string to render
+    :param cfg_string: The CFG string to render
     :param style: The style to render the CFG in. Choose from 'tree', 'boxes'.
     :return: A `graphviz.Graph` object.
     """
 
     START_END_SYMBOLS = {"(": ")", "[": "]"}
 
-    graph = graphviz.Graph(comment=string)
+    graph = graphviz.Graph(comment=cfg_string)
     all_nodes = []
 
     def parse_string(graph, initial_index=0, start_marker=None) -> (int, str):
         """
-        Parses the string starting at index, until a close parenthesis or the end of the string is found
+        Parses the string starting at the specified index, until a closing parenthesis or the end of the string is found.
         :param initial_index: The index in the string to start at
         :param start_marker: If provided, defines the type of marker that the group uses to mark the start. Must be either ( or [
-        :return: (new_index, subroot) where new_index is the next un-parsed index, and `node` is the root of the subtree
+        :return: (new_index, subtree_root) where new_index is the next un-parsed index, and `subtree_root` is the root of the subtree
         """
         index = initial_index
         current_parent = None  # The parent of the current subtree
@@ -34,10 +34,10 @@ def draw_cfg(string: str, style='tree'):
         hide_box_attrs = {'peripheries': '0', 'margin': '2'}
 
         with graph.subgraph(name=("cluster_" if use_clusters else "") + str(initial_index),
-                            graph_attr=hide_box_attrs if style == 'tree' else {}) as subgraph:
+                               graph_attr=hide_box_attrs if style == 'tree' else {}) as subgraph:
 
-            while index < len(string):
-                char = string[index]
+            while index < len(cfg_string):
+                char = cfg_string[index]
 
                 if char.isspace() or char in START_END_SYMBOLS.values():
                     # If we are currently reading a node, we've finished. Add the node to the graph.
@@ -62,7 +62,7 @@ def draw_cfg(string: str, style='tree'):
                             # Parenthesis mismatch
                             raise SyntaxError(
                                 f"Parenthesis mismatch. A matching parenthesis {START_END_SYMBOLS[start_marker]} must be provided for the parenthesis at position {initial_index}",
-                                ("", 1, index, string))
+                                ("", 1, index, cfg_string))
 
                         # Add edges for all the daughters
                         for child in current_children:
@@ -91,7 +91,7 @@ def draw_cfg(string: str, style='tree'):
                 # If we got this far and never saw an end marker, we're missing parenthesis
                 raise SyntaxError(
                     f"Parenthesis mismatch. A matching parenthesis {START_END_SYMBOLS[start_marker]} must be provided for the parenthesis at position {initial_index}",
-                    ("", 1, index, string))
+                    ("", 1, index, cfg_string))
 
     parse_string(graph)
     graph.attr(ranksep='0.3', splines='false')
