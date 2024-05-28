@@ -4,7 +4,6 @@
 
 import graphviz
 
-
 def draw_cfg(cfg_string: str, style='tree'):
     """
     Draws a CFG string as a tree with graphviz.
@@ -18,7 +17,7 @@ def draw_cfg(cfg_string: str, style='tree'):
     graph = graphviz.Graph(comment=cfg_string)
     all_nodes = []
 
-    def parse_string(graph, initial_index=0, start_marker=None) -> (int, str):
+    def parse_string(graph, initial_index=0, start_marker=None) -> tuple[int, str]:
         """
         Parses the string starting at the specified index, until a closing parenthesis or the end of the string is found.
         :param initial_index: The index in the string to start at
