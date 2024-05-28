@@ -37,9 +37,9 @@ def draw_cfg(cfg_string: str, style='tree'):
                                graph_attr=hide_box_attrs if style == 'tree' else {}) as subgraph:
 
             while index < len(cfg_string):
-                char = cfg_string[index]
+                parsed_char = cfg_string[index]
 
-                if char.isspace() or char in START_END_SYMBOLS.values():
+                if parsed_char.isspace() or parsed_char in START_END_SYMBOLS.values():
                     # If we are currently reading a node, we've finished. Add the node to the graph.
                     if current_node:
                         node_id = str(len(all_nodes))
@@ -55,10 +55,10 @@ def draw_cfg(cfg_string: str, style='tree'):
                             current_children.append(node_id)
                         current_node = None
 
-                    if char in START_END_SYMBOLS.values():
+                    if parsed_char in START_END_SYMBOLS.values():
                         # We found the end. This *must* be the end of the current subtree,
                         # because any other end symbols should have already been parsed.
-                        if START_END_SYMBOLS[start_marker] != char:
+                        if START_END_SYMBOLS[start_marker] != parsed_char:
                             # Parenthesis mismatch
                             raise SyntaxError(
                                 f"Parenthesis mismatch. A matching parenthesis {START_END_SYMBOLS[start_marker]} must be provided for the parenthesis at position {initial_index}",
@@ -73,18 +73,18 @@ def draw_cfg(cfg_string: str, style='tree'):
                                 subgraph.node(child, all_nodes[int(child)], group=current_parent)
 
                         return index, current_parent
-                elif char in START_END_SYMBOLS.keys():
+                elif parsed_char in START_END_SYMBOLS.keys():
                     # We start a new group which continues until a close parenthesis
-                    (index, subroot_id) = parse_string(subgraph, index + 1, start_marker=char)
+                    (index, subroot_id) = parse_string(subgraph, index + 1, start_marker=parsed_char)
                     if current_parent:
                         current_children.append(subroot_id)
                 else:
                     # This must be either the root of the current subtree, or a leaf daughter
                     # Read the string until we see a space
                     if current_node:
-                        current_node += char
+                        current_node += parsed_char
                     else:
-                        current_node = char
+                        current_node = parsed_char
                 index += 1
 
             if start_marker:
